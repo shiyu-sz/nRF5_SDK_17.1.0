@@ -7,3 +7,5 @@
 *.ind
 *.jlink
 .vscode/
+
+!key/*.hex
