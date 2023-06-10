@@ -115,7 +115,7 @@
 
 #define DEAD_BEEF                       0xDEADBEEF                                  /**< Value used as error code on stack dump, can be used to identify stack location on stack unwind. */
 
-
+APP_TIMER_DEF(m_app_timer_id);
 NRF_BLE_GATT_DEF(m_gatt);                                                           /**< GATT module instance. */
 NRF_BLE_QWR_DEF(m_qwr);                                                             /**< Context for the Queued Write module.*/
 BLE_ADVERTISING_DEF(m_advertising);                                                 /**< Advertising module instance. */
@@ -310,6 +310,12 @@ static void pm_evt_handler(pm_evt_t const * p_evt)
     pm_handler_flash_clean(p_evt);
 }
 
+void timer_timeout_handler(void * p_context)
+{
+  nrf_gpio_pin_toggle(17);
+  nrf_gpio_pin_toggle(18);
+  NRF_LOG_INFO("run v2");
+}
 
 /**@brief Function for the Timer initialization.
  *
@@ -324,13 +330,12 @@ static void timers_init(void)
 
     // Create timers.
 
-    /* YOUR_JOB: Create any timers to be used by the application.
-                 Below is an example of how to create a timer.
-                 For every new timer needed, increase the value of the macro APP_TIMER_MAX_TIMERS by
-                 one.
-       uint32_t err_code;
+    //YOUR_JOB: Create any timers to be used by the application.
+    //             Below is an example of how to create a timer.
+    //             For every new timer needed, increase the value of the macro APP_TIMER_MAX_TIMERS by
+    //             one.
        err_code = app_timer_create(&m_app_timer_id, APP_TIMER_MODE_REPEATED, timer_timeout_handler);
-       APP_ERROR_CHECK(err_code); */
+       APP_ERROR_CHECK(err_code);
 }
 
 
@@ -511,10 +516,10 @@ static void conn_params_init(void)
  */
 static void application_timers_start(void)
 {
-    /* YOUR_JOB: Start your timers. below is an example of how to start a timer.
+       // YOUR_JOB: Start your timers. below is an example of how to start a timer.
        uint32_t err_code;
-       err_code = app_timer_start(m_app_timer_id, TIMER_INTERVAL, NULL);
-       APP_ERROR_CHECK(err_code); */
+       err_code = app_timer_start(m_app_timer_id, APP_TIMER_TICKS(1000), NULL);
+       APP_ERROR_CHECK(err_code);
 }
 
 
