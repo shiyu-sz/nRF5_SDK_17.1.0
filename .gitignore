@@ -1,0 +1,9 @@
+*.d
+*.o
+*.elf
+*.hex
+*.ld
+*.map
+*.ind
+*.jlink
+.vscode/
