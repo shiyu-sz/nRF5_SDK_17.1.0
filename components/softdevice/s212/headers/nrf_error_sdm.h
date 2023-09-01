@@ -1,6 +1,5 @@
-/**
- * Copyright (c) 2015 - 2021, Nordic Semiconductor ASA
- *
+/*
+ * Copyright (c) 2012 - 2017, Nordic Semiconductor ASA
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -35,36 +34,37 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
  */
-#ifndef ANT_KEY_MANAGER_CONFIG_H__
-#define ANT_KEY_MANAGER_CONFIG_H__
+
+ /**
+  @addtogroup nrf_sdm_api
+  @{
+  @defgroup nrf_sdm_error SoftDevice Manager Error Codes
+  @{
+
+  @brief Error definitions for the SDM API
+*/
+
+/* Header guard */
+#ifndef NRF_ERROR_SDM_H__
+#define NRF_ERROR_SDM_H__
+
+#include "nrf_error.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/**
- * @addtogroup ant_key_manager
- * @{
- */
-
-#ifndef ANT_PLUS_NETWORK_KEY
-    #define ANT_PLUS_NETWORK_KEY    {0xB9,0xA5,0x21,0xFB,0xBD,0x72,0xC3,0x45}            /**< The ANT+ network key. */
-    // #define ANT_PLUS_NETWORK_KEY    {0, 0, 0, 0, 0, 0, 0, 0}
-#endif //ANT_PLUS_NETWORK_KEY
-
-#ifndef ANT_FS_NETWORK_KEY
-    #define ANT_FS_NETWORK_KEY      {0, 0, 0, 0, 0, 0, 0, 0}           /**< The ANT-FS network key. */
-#endif // ANT_FS_NETWORK_KEY
-
-/**
- * @}
- */
-
+#define NRF_ERROR_SDM_LFCLK_SOURCE_UNKNOWN              (NRF_ERROR_SDM_BASE_NUM + 0)  ///< Unknown LFCLK source.
+#define NRF_ERROR_SDM_INCORRECT_INTERRUPT_CONFIGURATION (NRF_ERROR_SDM_BASE_NUM + 1)  ///< Incorrect interrupt configuration (can be caused by using illegal priority levels, or having enabled SoftDevice interrupts).
+#define NRF_ERROR_SDM_INCORRECT_CLENR0                  (NRF_ERROR_SDM_BASE_NUM + 2)  ///< Incorrect CLENR0 (can be caused by erroneous SoftDevice flashing).
 
 #ifdef __cplusplus
 }
 #endif
+#endif // NRF_ERROR_SDM_H__
 
-#endif // ANT_KEY_MANAGER_CONFIG_H__
+/**
+  @}
+  @}
+*/

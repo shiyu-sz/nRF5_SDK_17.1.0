@@ -1,6 +1,5 @@
-/**
- * Copyright (c) 2015 - 2021, Nordic Semiconductor ASA
- *
+/*
+ * Copyright (c) 2012 - 2017, Nordic Semiconductor ASA
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -35,36 +34,52 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
  */
-#ifndef ANT_KEY_MANAGER_CONFIG_H__
-#define ANT_KEY_MANAGER_CONFIG_H__
 
+/**
+  @addtogroup nrf_soc_api
+  @{
+  @defgroup nrf_soc_error SoC Library Error Codes
+  @{
+
+  @brief Error definitions for the SoC library
+
+*/
+
+/* Header guard */
+#ifndef NRF_ERROR_SOC_H__
+#define NRF_ERROR_SOC_H__
+
+#include "nrf_error.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/**
- * @addtogroup ant_key_manager
- * @{
- */
+/* Mutex Errors */
+#define NRF_ERROR_SOC_MUTEX_ALREADY_TAKEN                 (NRF_ERROR_SOC_BASE_NUM + 0)  ///< Mutex already taken
 
-#ifndef ANT_PLUS_NETWORK_KEY
-    #define ANT_PLUS_NETWORK_KEY    {0xB9,0xA5,0x21,0xFB,0xBD,0x72,0xC3,0x45}            /**< The ANT+ network key. */
-    // #define ANT_PLUS_NETWORK_KEY    {0, 0, 0, 0, 0, 0, 0, 0}
-#endif //ANT_PLUS_NETWORK_KEY
+/* NVIC errors */
+#define NRF_ERROR_SOC_NVIC_INTERRUPT_NOT_AVAILABLE        (NRF_ERROR_SOC_BASE_NUM + 1)  ///< NVIC interrupt not available
+#define NRF_ERROR_SOC_NVIC_INTERRUPT_PRIORITY_NOT_ALLOWED (NRF_ERROR_SOC_BASE_NUM + 2)  ///< NVIC interrupt priority not allowed
+#define NRF_ERROR_SOC_NVIC_SHOULD_NOT_RETURN              (NRF_ERROR_SOC_BASE_NUM + 3)  ///< NVIC should not return
 
-#ifndef ANT_FS_NETWORK_KEY
-    #define ANT_FS_NETWORK_KEY      {0, 0, 0, 0, 0, 0, 0, 0}           /**< The ANT-FS network key. */
-#endif // ANT_FS_NETWORK_KEY
+/* Power errors */
+#define NRF_ERROR_SOC_POWER_MODE_UNKNOWN                  (NRF_ERROR_SOC_BASE_NUM + 4)  ///< Power mode unknown
+#define NRF_ERROR_SOC_POWER_POF_THRESHOLD_UNKNOWN         (NRF_ERROR_SOC_BASE_NUM + 5)  ///< Power POF threshold unknown
+#define NRF_ERROR_SOC_POWER_OFF_SHOULD_NOT_RETURN         (NRF_ERROR_SOC_BASE_NUM + 6)  ///< Power off should not return
 
-/**
- * @}
- */
+/* Rand errors */
+#define NRF_ERROR_SOC_RAND_NOT_ENOUGH_VALUES              (NRF_ERROR_SOC_BASE_NUM + 7)  ///< RAND not enough values
 
+/* PPI errors */
+#define NRF_ERROR_SOC_PPI_INVALID_CHANNEL                 (NRF_ERROR_SOC_BASE_NUM + 8)  ///< Invalid PPI Channel
+#define NRF_ERROR_SOC_PPI_INVALID_GROUP                   (NRF_ERROR_SOC_BASE_NUM + 9)  ///< Invalid PPI Group
 
 #ifdef __cplusplus
 }
 #endif
-
-#endif // ANT_KEY_MANAGER_CONFIG_H__
+#endif // NRF_ERROR_SOC_H__
+/**
+  @}
+  @}
+*/

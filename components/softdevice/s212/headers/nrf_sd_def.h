@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2015 - 2021, Nordic Semiconductor ASA
+ * Copyright (c) 2015 - 2017, Nordic Semiconductor ASA
  *
  * All rights reserved.
  *
@@ -37,34 +37,23 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
-#ifndef ANT_KEY_MANAGER_CONFIG_H__
-#define ANT_KEY_MANAGER_CONFIG_H__
+#ifndef NRF_SD_DEF_H__
+#define NRF_SD_DEF_H__
+
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/**
- * @addtogroup ant_key_manager
- * @{
- */
-
-#ifndef ANT_PLUS_NETWORK_KEY
-    #define ANT_PLUS_NETWORK_KEY    {0xB9,0xA5,0x21,0xFB,0xBD,0x72,0xC3,0x45}            /**< The ANT+ network key. */
-    // #define ANT_PLUS_NETWORK_KEY    {0, 0, 0, 0, 0, 0, 0, 0}
-#endif //ANT_PLUS_NETWORK_KEY
-
-#ifndef ANT_FS_NETWORK_KEY
-    #define ANT_FS_NETWORK_KEY      {0, 0, 0, 0, 0, 0, 0, 0}           /**< The ANT-FS network key. */
-#endif // ANT_FS_NETWORK_KEY
-
-/**
- * @}
- */
+#define SD_PPI_CHANNELS_USED            0xFFFE0000uL /**< PPI channels utilized by SotfDevice (not available to the application). */
+#define SD_PPI_GROUPS_USED              0x0000000CuL /**< PPI groups utilized by SoftDevice (not available to the application). */
+#define SD_TIMERS_USED                  0x00000001uL /**< Timers used by SoftDevice. */
+#define SD_SWI_USED                     0x0000003CuL /**< Software interrupts used by SoftDevice */
 
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ANT_KEY_MANAGER_CONFIG_H__
+#endif /* NRF_SD_DEF_H__ */

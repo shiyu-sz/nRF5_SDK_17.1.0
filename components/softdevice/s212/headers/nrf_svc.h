@@ -1,6 +1,5 @@
-/**
- * Copyright (c) 2015 - 2021, Nordic Semiconductor ASA
- *
+/*
+ * Copyright (c) 2012 - 2019, Nordic Semiconductor ASA
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -35,36 +34,67 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
  */
-#ifndef ANT_KEY_MANAGER_CONFIG_H__
-#define ANT_KEY_MANAGER_CONFIG_H__
+
+#ifndef NRF_SVC__
+#define NRF_SVC__
+
+#include "stdint.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/**
- * @addtogroup ant_key_manager
- * @{
+/** @brief Supervisor call declaration.
+ *
+ * A call to a function marked with @ref SVCALL, will trigger a Supervisor Call (SVC) Exception.
+ * The SVCs with SVC numbers 0x00-0x0F are forwared to the application. All other SVCs are handled by the SoftDevice.
+ *
+ * @param[in] number      The SVC number to be used.
+ * @param[in] return_type The return type of the SVC function.
+ * @param[in] signature   Function signature. The function can have at most four arguments.
  */
 
-#ifndef ANT_PLUS_NETWORK_KEY
-    #define ANT_PLUS_NETWORK_KEY    {0xB9,0xA5,0x21,0xFB,0xBD,0x72,0xC3,0x45}            /**< The ANT+ network key. */
-    // #define ANT_PLUS_NETWORK_KEY    {0, 0, 0, 0, 0, 0, 0, 0}
-#endif //ANT_PLUS_NETWORK_KEY
+#ifdef SVCALL_AS_NORMAL_FUNCTION
+#define SVCALL(number, return_type, signature) return_type signature
+#else
 
-#ifndef ANT_FS_NETWORK_KEY
-    #define ANT_FS_NETWORK_KEY      {0, 0, 0, 0, 0, 0, 0, 0}           /**< The ANT-FS network key. */
-#endif // ANT_FS_NETWORK_KEY
+#ifndef SVCALL
+#if defined (__CC_ARM)
+#define SVCALL(number, return_type, signature) return_type __svc(number) signature
+#elif defined (__GNUC__)
+#ifdef __cplusplus
+#define GCC_CAST_CPP (uint16_t)
+#else
+#define GCC_CAST_CPP
+#endif
+#define SVCALL(number, return_type, signature)          \
+  _Pragma("GCC diagnostic push")                        \
+  _Pragma("GCC diagnostic ignored \"-Wreturn-type\"")   \
+  __attribute__((naked))                                \
+  __attribute__((unused))                               \
+  static return_type signature                          \
+  {                                                     \
+    __asm(                                              \
+        "svc %0\n"                                      \
+        "bx r14" : : "I" (GCC_CAST_CPP number) : "r0"   \
+    );                                                  \
+  }                                                     \
+  _Pragma("GCC diagnostic pop")
 
-/**
- * @}
- */
+#elif defined (__ICCARM__)
+#define PRAGMA(x) _Pragma(#x)
+#define SVCALL(number, return_type, signature)          \
+PRAGMA(swi_number = (number))                           \
+ __swi return_type signature;
+#else
+#define SVCALL(number, return_type, signature) return_type signature
+#endif
+#endif  // SVCALL
 
+#endif  // SVCALL_AS_NORMAL_FUNCTION
 
 #ifdef __cplusplus
 }
 #endif
-
-#endif // ANT_KEY_MANAGER_CONFIG_H__
+#endif  // NRF_SVC__
