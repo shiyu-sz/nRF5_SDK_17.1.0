@@ -1070,6 +1070,80 @@ static void bsp_event_handler(bsp_event_t event)
     }
 }
 
+void key_event(bsp_event_t event)
+{
+    ret_code_t ret;
+
+    switch (event)
+    {
+        case BSP_EVENT_SLEEP:
+            sleep_mode_enter();
+            break;
+
+        case BSP_EVENT_DISCONNECT:
+            ret = sd_ble_gap_disconnect(m_cur_conn_handle,
+                                        BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
+            if (ret != NRF_ERROR_INVALID_STATE)
+            {
+                APP_ERROR_CHECK(ret);
+            }
+            break;
+
+        case BSP_EVENT_WHITELIST_OFF:
+            if (m_ancs_c.conn_handle == BLE_CONN_HANDLE_INVALID)
+            {
+                ret = ble_advertising_restart_without_whitelist(&m_advertising);
+                if (ret != NRF_ERROR_INVALID_STATE)
+                {
+                    APP_ERROR_CHECK(ret);
+                }
+            }
+            break;
+
+        case BSP_EVENT_KEY_0:
+            ret = nrf_ble_ancs_c_request_attrs(&m_ancs_c, &m_notification_latest);
+            APP_ERROR_CHECK(ret);
+            break;
+
+        case BSP_EVENT_KEY_1:
+            if (m_notif_attr_app_id_latest.attr_id == BLE_ANCS_NOTIF_ATTR_ID_APP_IDENTIFIER
+                && m_notif_attr_app_id_latest.attr_len != 0)
+            {
+                NRF_LOG_INFO("Request for %s: ", (uint32_t)m_notif_attr_app_id_latest.p_attr_data);
+                ret = nrf_ble_ancs_c_app_attr_request(&m_ancs_c,
+                                                      m_notif_attr_app_id_latest.p_attr_data,
+                                                      m_notif_attr_app_id_latest.attr_len);
+                APP_ERROR_CHECK(ret);
+            }
+            break;
+
+        case BSP_EVENT_KEY_2:
+            if (m_notification_latest.evt_flags.positive_action == true)
+            {
+                NRF_LOG_INFO("Performing Positive Action.");
+                ret = nrf_ancs_perform_notif_action(&m_ancs_c,
+                                                    m_notification_latest.notif_uid,
+                                                    ACTION_ID_POSITIVE);
+                APP_ERROR_CHECK(ret);
+            }
+            break;
+
+        case BSP_EVENT_KEY_3:
+            if (m_notification_latest.evt_flags.negative_action == true)
+            {
+                NRF_LOG_INFO("Performing Negative Action.");
+                ret = nrf_ancs_perform_notif_action(&m_ancs_c,
+                                                    m_notification_latest.notif_uid,
+                                                    ACTION_ID_NEGATIVE);
+                APP_ERROR_CHECK(ret);
+            }
+            break;
+
+        default:
+            break;
+    }
+}
+
 
 /**@brief Function for initializing the BLE stack.
  *
@@ -1340,6 +1414,8 @@ int main(void)
     // Start execution.
     NRF_LOG_INFO("Apple Notification Center Service client example started.");
     advertising_start(erase_bonds);
+
+    cli_init();
 
     // Enter main loop.
     for (;;)
