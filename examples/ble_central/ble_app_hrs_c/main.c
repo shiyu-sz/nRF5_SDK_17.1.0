@@ -74,7 +74,8 @@
 #include "nrf_log_ctrl.h"
 #include "nrf_log_default_backends.h"
 #include "nrf_ble_scan.h"
-
+#include "app_uart.h"
+#include "nrf_uart.h"
 
 #define APP_BLE_CONN_CFG_TAG        1                                   /**< A tag identifying the SoftDevice BLE configuration. */
 
@@ -156,6 +157,7 @@ static ble_gap_addr_t const m_target_periph_addr =
 
 static void scan_start(void);
 
+uint16_t uart_write(uint8_t * buff, uint16_t len);
 
 /**@brief Function for asserts in the SoftDevice.
  *
@@ -537,6 +539,12 @@ static void hrs_c_evt_handler(ble_hrs_c_t * p_hrs_c, ble_hrs_c_evt_t * p_hrs_c_e
         case BLE_HRS_C_EVT_HRM_NOTIFICATION:
         {
             NRF_LOG_INFO("Heart Rate = %d.", p_hrs_c_evt->params.hrm.hr_value);
+
+            uint8_t buff[5] = {0x55, 0x00, 0x00, 0x00, 0xAA};
+            buff[1] = (p_hrs_c_evt->params.hrm.hr_value >> 8) & 0xFF;
+            buff[2] = p_hrs_c_evt->params.hrm.hr_value & 0xFF;
+            buff[3] = (buff[1] + buff[2]) & 0xFF;
+            uart_write((unsigned char *)buff, 5);
 
             if (p_hrs_c_evt->params.hrm.rr_intervals_cnt != 0)
             {
@@ -954,6 +962,66 @@ void scanning_start(bool * p_erase_bonds)
     }
 }
 
+// time consuming 10us
+void uart_error_handle(app_uart_evt_t * p_event)
+{
+    // nrf_gpio_pin_set(24);
+    if (p_event->evt_type == APP_UART_DATA_READY)
+    {
+        uint8_t rx;
+        if(app_uart_get(&rx) == NRF_SUCCESS)
+		{
+		}
+    } else if (p_event->evt_type == APP_UART_COMMUNICATION_ERROR)
+    {
+        NRF_LOG_INFO("APP_UART_COMMUNICATION_ERROR");
+        // APP_ERROR_HANDLER(p_event->data.error_communication);
+    }
+    else if (p_event->evt_type == APP_UART_FIFO_ERROR)
+    {
+        NRF_LOG_INFO("APP_UART_FIFO_ERROR");
+        // APP_ERROR_HANDLER(p_event->data.error_code);
+    }
+    // nrf_gpio_pin_clear(24);
+}
+
+uint16_t uart_write(uint8_t * buff, uint16_t len)
+{
+	uint16_t i = 0;
+	
+	for( i=0; i<len; i++ )
+	{
+		if(app_uart_put(buff[i]) != NRF_SUCCESS)
+		{
+			break;
+		}
+	}
+	return i;
+}
+
+void uart_init()
+{
+    uint32_t err_code;
+
+    const app_uart_comm_params_t comm_params =
+      {
+          8,
+          6,
+          0,
+          0,
+          APP_UART_FLOW_CONTROL_DISABLED,
+          true,
+          NRF_UART_BAUDRATE_115200
+      };
+
+    APP_UART_FIFO_INIT(&comm_params,
+                         128,
+                         128,
+                         uart_error_handle,
+                         APP_IRQ_PRIORITY_LOWEST,
+                         err_code);
+    APP_ERROR_CHECK(err_code);
+}
 
 int main(void)
 {
@@ -975,6 +1043,8 @@ int main(void)
     // Start execution.
     NRF_LOG_INFO("Heart Rate collector example started.");
     scanning_start(&erase_bonds);
+
+    uart_init();
 
     // Enter main loop.
     for (;;)
